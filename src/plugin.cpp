@@ -86,9 +86,23 @@ vector<RankItem> Plugin::handleGlobalQuery(const Query &query)
     vector<RankItem> r;
 
     // List matching timers
-    for (auto &timer: timers_)
-        if(auto m = matcher.match(timer.objectName()); m)
-            r.emplace_back(makeTimerItem(timer), m);
+    for (auto &t: timers_)
+        if(auto m = matcher.match(t.objectName()); m)
+            r.emplace_back(
+                StandardItem::make(
+                    QStringLiteral("timer"),
+                    t.titleString(),
+                    QStringLiteral("%1 | %2").arg(t.durationString(), t.timeoutString()),
+                    icon_urls,
+                    {
+                        {
+                            QStringLiteral("rem"), tr("Remove", "Action verb form"),
+                            [t=&t, this] { removeTimer(t); }
+                        }
+                    }
+                    ),
+                m
+            );
 
     // Add new timer item
     QString name;
@@ -140,25 +154,22 @@ vector<RankItem> Plugin::handleGlobalQuery(const Query &query)
 vector<shared_ptr<Item>> Plugin::handleEmptyQuery()
 {
     vector<shared_ptr<Item>> results;
-    for (auto &timer: timers_)
-        results.emplace_back(makeTimerItem(timer));
+    for (auto &t: timers_)
+        results.emplace_back(
+            StandardItem::make(
+                QStringLiteral("timer"),
+                t.titleString(),
+                QStringLiteral("%1 | %2").arg(t.durationString(), t.timeoutString()),
+                icon_urls,
+                {
+                    {
+                        QStringLiteral("rem"), tr("Remove", "Action verb form"),
+                        [t=&t, this] { removeTimer(t); show(""); }, false  // rerun to remove
+                    }
+                }
+            )
+        );
     return results;
-}
-
-shared_ptr<Item> Plugin::makeTimerItem(Timer &t)
-{
-    return StandardItem::make(
-        QStringLiteral("timer"),
-        t.titleString(),
-        QStringLiteral("%1 | %2").arg(t.durationString(), t.timeoutString()),
-        icon_urls,
-        {
-            {
-                QStringLiteral("rem"), tr("Remove", "Action verb form"),
-                [t=&t, this] { removeTimer(t); }
-            }
-        }
-    );
 }
 
 void Plugin::startTimer(const QString &name, uint seconds)

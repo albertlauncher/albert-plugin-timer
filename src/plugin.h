@@ -39,7 +39,6 @@ public:
 
 private:
 
-    std::shared_ptr<albert::Item> makeTimerItem(Timer&);
     void startTimer(const QString &name, uint seconds);
     void removeTimer(Timer*);
 
