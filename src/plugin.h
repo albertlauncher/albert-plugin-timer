@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Manuel Schneider
+// Copyright (c) 2024-2025 Manuel Schneider
 
 #pragma once
 #include <QTimer>
@@ -13,12 +13,17 @@ class Timer : public QTimer
 public:
 
     Timer(const QString &name, int interval);
+    ~Timer();
+
+    QString titleString() const;
+    QString durationString() const;
+    QString timeoutString() const;
+
     void onTimeout();
     const uint64_t end;
     albert::Notification notification;
 
 };
-
 
 class Plugin : public albert::ExtensionPlugin,
                public albert::GlobalQueryHandler
@@ -34,13 +39,18 @@ public:
 
 private:
 
-    std::shared_ptr<albert::Item> makeSetTimerItem(uint dur, const QString &name);
     std::shared_ptr<albert::Item> makeTimerItem(Timer&);
     void startTimer(const QString &name, uint seconds);
     void removeTimer(Timer*);
 
-    const QStringList icon_urls{"gen:?text=⏲️"};
+    static const QStringList icon_urls;
     std::list<Timer> timers_;
     uint timer_counter_ = 0;
+
+    struct {
+        QString n_hours;
+        QString n_minutes;
+        QString n_seconds;
+    } const strings;
 
 };
