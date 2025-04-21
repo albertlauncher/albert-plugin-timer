@@ -6,24 +6,36 @@
 #include <albert/globalqueryhandler.h>
 #include <albert/notification.h>
 #include <list>
+#include <set>
+class Plugin;
 
-
-class Timer : public QTimer
+class Timer : public QTimer, public albert::Item
 {
 public:
 
-    Timer(const QString &name, int interval);
+    Timer(Plugin&, const QString &name, int interval);
     ~Timer();
 
-    QString titleString() const;
-    QString durationString() const;
-    QString timeoutString() const;
+    QString id() const override;
+    QString text() const override;
+    QString subtext() const override;
+    QStringList iconUrls() const override;
+    std::vector<albert::Action> actions() const override;
+    void addObserver(Observer *observer) override;
+    void removeObserver(Observer *observer) override;
 
-    void onTimeout();
-    const uint64_t end;
+    QString titleString() const;
+    QString expiryString() const;
+
+    Plugin &plugin_;
+    const uint64_t interval;
+    uint64_t left;
+    uint64_t end;
     albert::Notification notification;
+    std::set<Observer*> observers;
 
 };
+
 
 class Plugin : public albert::ExtensionPlugin,
                public albert::GlobalQueryHandler
@@ -37,19 +49,10 @@ public:
     std::vector<albert::RankItem> handleGlobalQuery(const albert::Query &) override;
     std::vector<std::shared_ptr<albert::Item>> handleEmptyQuery() override;
 
-private:
-
     void startTimer(const QString &name, uint seconds);
-    void removeTimer(Timer*);
+    void removeTimer(const Timer *);
 
-    static const QStringList icon_urls;
-    std::list<Timer> timers_;
+    std::list<std::shared_ptr<Timer>> timers_;
     uint timer_counter_ = 0;
-
-    struct {
-        QString n_hours;
-        QString n_minutes;
-        QString n_seconds;
-    } const strings;
 
 };
