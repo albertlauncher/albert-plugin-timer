@@ -31,7 +31,7 @@ public:
     const uint64_t interval;
     uint64_t left;
     uint64_t end;
-    albert::Notification notification;
+    albert::util::Notification notification;
     std::set<Observer*> observers;
 
 };

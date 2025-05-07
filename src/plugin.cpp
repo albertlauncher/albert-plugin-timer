@@ -7,17 +7,17 @@
 #include <albert/logging.h>
 #include <albert/matcher.h>
 #include <albert/standarditem.h>
-#include <albert/timestrings.h>
+#include <albert/stringutil.h>
 ALBERT_LOGGING_CATEGORY("timer")
-using namespace albert::util::strings;
 using namespace albert;
 using namespace std;
+using namespace util;
 
 static const QStringList icon_urls = {"gen:?text=⏲️"};
 
-Timer::Timer(Plugin &plugin, const QString &name, int interval):
+Timer::Timer(Plugin &plugin, const QString &name, int _interval):
     plugin_(plugin),
-    interval(interval),
+    interval(_interval),
     left(interval),
     end(QDateTime::currentSecsSinceEpoch() + interval)
 {
