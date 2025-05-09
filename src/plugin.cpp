@@ -7,13 +7,70 @@
 #include <albert/logging.h>
 #include <albert/matcher.h>
 #include <albert/standarditem.h>
-#include <albert/stringutil.h>
 ALBERT_LOGGING_CATEGORY("timer")
 using namespace albert;
 using namespace std;
 using namespace util;
 
 static const QStringList icon_urls = {"gen:?text=⏲️"};
+
+// QString albert::util::humanDurationString(uint64_t sec)
+// {
+//     if (sec == 0)
+//         return {};
+
+//     const auto &[h, modm] = div(sec, 3600);
+//     const auto &[m, s] = div(modm, 60);
+
+//     QStringList parts;
+//     if (h > 0)
+//         parts.append(QCoreApplication::translate("strings", "%n hour(s)", nullptr, h));
+//     if (m > 0)
+//         parts.append(QCoreApplication::translate("strings", "%n minute(s)", nullptr, m));
+//     if (s > 0)
+//         parts.append(QCoreApplication::translate("strings", "%n second(s)", nullptr, s));
+
+//     parts[0][0] = parts[0][0].toUpper();
+
+//     QString string = parts.join(" ");
+//     return string;
+// }
+
+static QString digitalDurationString(uint64_t sec)
+{
+    const auto &[h, modm] = div(sec, 3600);
+    const auto &[m, s] = div(modm, 60);
+    return QStringLiteral("%1:%2:%3")
+        .arg(h, 2, 10, QChar('0'))
+        .arg(m, 2, 10, QChar('0'))
+        .arg(s, 2, 10, QChar('0'));
+}
+
+static uint64_t durFromMatch(QRegularExpressionMatch m)
+{
+    uint64_t dur = 0;
+    if (m.capturedLength(1)) dur += m.captured(1).toInt() * 60 * 60;  // hours
+    if (m.capturedLength(2)) dur += m.captured(2).toInt() * 60;       // minutes
+    if (m.capturedLength(3)) dur += m.captured(3).toInt();            // seconds
+    return dur;
+}
+
+static uint64_t parseNaturalDurationString(const QString &s)
+{
+    static QRegularExpression re(R"(^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$)");
+    if (auto m = re.match(s); m.hasMatch() && m.capturedLength())  // required because all optional matches empty string
+        return durFromMatch(m);
+    return 0;
+}
+
+static uint64_t parseDigitalDurationString(const QString &s)
+{
+    static QRegularExpression re(R"(^(?|(\d+):(\d*):(\d*)|()(\d+):(\d*)|()()(\d+))$)");
+    if (auto m = re.match(s); m.hasMatch())
+        return durFromMatch(m);
+    return 0;
+}
+
 
 Timer::Timer(Plugin &plugin, const QString &name, int _interval):
     plugin_(plugin),
