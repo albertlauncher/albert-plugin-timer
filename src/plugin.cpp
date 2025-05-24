@@ -8,11 +8,12 @@
 #include <albert/matcher.h>
 #include <albert/standarditem.h>
 ALBERT_LOGGING_CATEGORY("timer")
+using namespace Qt::StringLiterals;
 using namespace albert;
 using namespace std;
 using namespace util;
 
-static const QStringList icon_urls = {"gen:?text=⏲️"};
+static const QStringList icon_urls = {u"gen:?text=⏲️"_s};
 
 // QString albert::util::humanDurationString(uint64_t sec)
 // {
@@ -40,10 +41,10 @@ static QString digitalDurationString(uint64_t sec)
 {
     const auto &[h, modm] = div(sec, 3600);
     const auto &[m, s] = div(modm, 60);
-    return QStringLiteral("%1:%2:%3")
-        .arg(h, 2, 10, QChar('0'))
-        .arg(m, 2, 10, QChar('0'))
-        .arg(s, 2, 10, QChar('0'));
+    return u"%1:%2:%3"_s
+        .arg(h, 2, 10, '0'_L1)
+        .arg(m, 2, 10, '0'_L1)
+        .arg(s, 2, 10, '0'_L1);
 }
 
 static uint64_t durFromMatch(QRegularExpressionMatch m)
@@ -57,7 +58,7 @@ static uint64_t durFromMatch(QRegularExpressionMatch m)
 
 static uint64_t parseNaturalDurationString(const QString &s)
 {
-    static QRegularExpression re(R"(^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$)");
+    static QRegularExpression re(uR"(^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$)"_s);
     if (auto m = re.match(s); m.hasMatch() && m.capturedLength())  // required because all optional matches empty string
         return durFromMatch(m);
     return 0;
@@ -65,7 +66,7 @@ static uint64_t parseNaturalDurationString(const QString &s)
 
 static uint64_t parseDigitalDurationString(const QString &s)
 {
-    static QRegularExpression re(R"(^(?|(\d+):(\d*):(\d*)|()(\d+):(\d*)|()()(\d+))$)");
+    static QRegularExpression re(uR"(^(?|(\d+):(\d*):(\d*)|()(\d+):(\d*)|()()(\d+))$)"_s);
     if (auto m = re.match(s); m.hasMatch())
         return durFromMatch(m);
     return 0;
@@ -108,22 +109,22 @@ Timer::~Timer()
 }
 
 QString Timer::titleString() const
-{ return QStringLiteral("%1: %2").arg(Plugin::tr("Timer"), objectName()); }
+{ return u"%1: %2"_s.arg(Plugin::tr("Timer"), objectName()); }
 
 QString Timer::expiryString() const
 {
     return (isActive() ? Plugin::tr("Expires at %1") : Plugin::tr("Expired at %1"))
-        .arg(QLocale().toString(QDateTime::fromSecsSinceEpoch(end).time(), "hh:mm:ss"));
+        .arg(QLocale().toString(QDateTime::fromSecsSinceEpoch(end).time(), u"hh:mm:ss"_s));
 }
 
-QString Timer::id() const { return QStringLiteral("timer"); }
+QString Timer::id() const { return u"timer"_s; }
 
 QString Timer::text() const { return titleString(); }
 
 QString Timer::subtext() const
 {
     if (isActive())
-        return QStringLiteral("%1 | %2").arg(digitalDurationString(left), expiryString());
+        return u"%1 | %2"_s.arg(digitalDurationString(left), expiryString());
     else
         return expiryString();
 }
@@ -134,7 +135,7 @@ vector<Action> Timer::actions() const
 {
     return {
         {
-            QStringLiteral("rem"), Plugin::tr("Remove", "Action verb form"),
+            u"rem"_s, Plugin::tr("Remove", "Action verb form"),
             [this] { plugin_.removeTimer(this); }
         }
     };
@@ -175,16 +176,16 @@ vector<RankItem> Plugin::handleGlobalQuery(const Query &query)
     {
         QString name = s.section(QChar::Space, 1).trimmed();
         if (name.isEmpty())
-            name = QString("#%1").arg(timer_counter_);
+            name = u'#' + QString::number(timer_counter_);
 
         r.emplace_back(
             StandardItem::make(
-                QStringLiteral("set"),
-                QStringLiteral("%1: %2").arg(tr("Set timer"), name),
+                u"set"_s,
+                u"%1: %2"_s.arg(tr("Set timer"), name),
                 digitalDurationString(duration),
                 icon_urls,
                 {{
-                    QStringLiteral("set"), tr("Start", "Action verb form"),
+                    u"set"_s, tr("Start", "Action verb form"),
                     [=, this]{ startTimer(name, duration); }
 
                 }}
