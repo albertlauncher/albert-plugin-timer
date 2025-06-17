@@ -13,7 +13,10 @@ using namespace albert;
 using namespace std;
 using namespace util;
 
+namespace
+{
 static const QStringList icon_urls = {u"gen:?text=⏲️"_s};
+}
 
 // QString albert::util::humanDurationString(uint64_t sec)
 // {
