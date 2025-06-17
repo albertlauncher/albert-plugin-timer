@@ -32,7 +32,7 @@
     </message>
     <message>
         <source>Expires at %1</source>
-        <translation>Um %1 Uhr abgelaufen</translation>
+        <translation>Läuft %1 ab</translation>
     </message>
     <message>
         <source>Expired at %1</source>
