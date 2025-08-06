@@ -3,6 +3,7 @@
     "description": "Set timers",
     "description[de]": "Stelle Timer",
     "license": "MIT",
+    "maintainers": ["@manuelschneid3r"],
     "name": "Timers",
     "name[de]": "Timer",
     "url": "https://github.com/albertlauncher/albert-plugin-timer",
