@@ -1,1 +1,1 @@
-# albert-plugin-timer
+# Albert plugin: Timers
