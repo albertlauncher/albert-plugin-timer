@@ -4,18 +4,19 @@
 #include <QDateTime>
 #include <QLocale>
 #include <albert/albert.h>
+#include <albert/iconutil.h>
 #include <albert/logging.h>
 #include <albert/matcher.h>
 #include <albert/standarditem.h>
 ALBERT_LOGGING_CATEGORY("timer")
 using namespace Qt::StringLiterals;
+using namespace albert::util;
 using namespace albert;
 using namespace std;
-using namespace util;
 
 namespace
 {
-static const QStringList icon_urls = {u"gen:?text=⏲️"_s};
+static unique_ptr<Icon> makeIcon() { return makeGraphemeIcon(u"⏲️"_s); }
 }
 
 // QString albert::util::humanDurationString(uint64_t sec)
@@ -132,7 +133,7 @@ QString Timer::subtext() const
         return expiryString();
 }
 
-QStringList Timer::iconUrls() const { return icon_urls; }
+unique_ptr<Icon> Timer::icon() const { return ::makeIcon(); }
 
 vector<Action> Timer::actions() const
 {
@@ -186,7 +187,7 @@ vector<RankItem> Plugin::handleGlobalQuery(const Query &query)
                 u"set"_s,
                 u"%1: %2"_s.arg(tr("Set timer"), name),
                 digitalDurationString(duration),
-                icon_urls,
+                makeIcon,
                 {{
                     u"set"_s, tr("Start", "Action verb form"),
                     [=, this]{ startTimer(name, duration); }

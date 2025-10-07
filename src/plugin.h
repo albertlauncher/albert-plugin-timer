@@ -19,7 +19,7 @@ public:
     QString id() const override;
     QString text() const override;
     QString subtext() const override;
-    QStringList iconUrls() const override;
+    std::unique_ptr<albert::Icon> icon() const override;
     std::vector<albert::Action> actions() const override;
     void addObserver(Observer *observer) override;
     void removeObserver(Observer *observer) override;
