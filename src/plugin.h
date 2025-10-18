@@ -31,13 +31,13 @@ public:
     const uint64_t interval;
     uint64_t left;
     uint64_t end;
-    albert::util::Notification notification;
+    albert::Notification notification;
     std::set<Observer*> observers;
 
 };
 
 
-class Plugin : public albert::util::ExtensionPlugin,
+class Plugin : public albert::ExtensionPlugin,
                public albert::GlobalQueryHandler
 {
     ALBERT_PLUGIN
@@ -46,7 +46,7 @@ public:
 
     QString defaultTrigger() const override;
     QString synopsis(const QString &) const override;
-    std::vector<albert::RankItem> handleGlobalQuery(const albert::Query &) override;
+    std::vector<albert::RankItem> rankItems(albert::QueryContext &) override;
     std::vector<std::shared_ptr<albert::Item>> handleEmptyQuery() override;
 
     void startTimer(const QString &name, uint seconds);

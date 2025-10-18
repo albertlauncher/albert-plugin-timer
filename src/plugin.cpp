@@ -3,14 +3,12 @@
 #include "plugin.h"
 #include <QDateTime>
 #include <QLocale>
-#include <albert/albert.h>
 #include <albert/iconutil.h>
 #include <albert/logging.h>
 #include <albert/matcher.h>
 #include <albert/standarditem.h>
 ALBERT_LOGGING_CATEGORY("timer")
 using namespace Qt::StringLiterals;
-using namespace albert::util;
 using namespace albert;
 using namespace std;
 
@@ -19,7 +17,7 @@ namespace
 static unique_ptr<Icon> makeIcon() { return makeGraphemeIcon(u"⏲️"_s); }
 }
 
-// QString albert::util::humanDurationString(uint64_t sec)
+// QString albert::humanDurationString(uint64_t sec)
 // {
 //     if (sec == 0)
 //         return {};
@@ -155,12 +153,12 @@ QString Plugin::defaultTrigger() const { return tr("timer ", "The trigger. Lower
 
 QString Plugin::synopsis(const QString &) const { return tr("<duration> [name]"); }
 
-vector<RankItem> Plugin::handleGlobalQuery(const Query &query)
+vector<RankItem> Plugin::rankItems(QueryContext &ctx)
 {
-    if (!query.isValid())
+    if (!ctx.isValid())
         return {};
 
-    Matcher matcher(query);
+    Matcher matcher(ctx);
     vector<RankItem> r;
 
     // List matching timers
@@ -169,7 +167,7 @@ vector<RankItem> Plugin::handleGlobalQuery(const Query &query)
             r.emplace_back(t, m);
 
     // Add new timer item
-    auto s = query.string().trimmed();
+    auto s = ctx.query().trimmed();
     auto duration_string = s.section(QChar::Space, 0, 0, QString::SectionSkipEmpty);
 
     uint64_t duration = 0;
@@ -209,7 +207,7 @@ void Plugin::startTimer(const QString &name, uint seconds)
     ++timer_counter_;
     auto &timer = timers_.emplace_front(make_shared<Timer>(*this, name, seconds));
     QObject::connect(&timer->notification, &Notification::activated,
-                     &timer->notification, [t=&timer, this]{ removeTimer(t->get()); });
+                     this, [t=&timer, this]{ removeTimer(t->get()); });
 }
 
 void Plugin::removeTimer(const Timer *timer)
