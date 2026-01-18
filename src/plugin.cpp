@@ -3,7 +3,7 @@
 #include "plugin.h"
 #include <QDateTime>
 #include <QLocale>
-#include <albert/iconutil.h>
+#include <albert/icon.h>
 #include <albert/logging.h>
 #include <albert/matcher.h>
 #include <albert/standarditem.h>
@@ -14,7 +14,7 @@ using namespace std;
 
 namespace
 {
-static unique_ptr<Icon> makeIcon() { return makeGraphemeIcon(u"⏲️"_s); }
+static unique_ptr<Icon> makeIcon() { return Icon::grapheme(u"⏲️"_s); }
 }
 
 // QString albert::humanDurationString(uint64_t sec)
