@@ -190,7 +190,8 @@ vector<RankItem> Plugin::rankItems(QueryContext &ctx)
                     u"set"_s, tr("Start", "Action verb form"),
                     [=, this]{ startTimer(name, duration); }
 
-                }}
+                }},
+                u""_s  // Explicitly disable input action
                 ),
             1.0
             );
