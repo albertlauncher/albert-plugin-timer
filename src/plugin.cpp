@@ -95,7 +95,7 @@ Timer::Timer(Plugin &plugin, const QString &name, int _interval):
             notification.send();
         }
         for (auto obs : observers)
-            obs->notify(this);
+            obs->onItemChanged(this);
     });
 
     notification.setTitle(titleString());
