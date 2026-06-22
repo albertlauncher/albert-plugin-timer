@@ -153,7 +153,7 @@ QString Plugin::defaultTrigger() const { return tr("timer ", "The trigger. Lower
 
 QString Plugin::synopsis(const QString &) const { return tr("<duration> [name]"); }
 
-vector<RankItem> Plugin::rankItems(QueryContext &ctx)
+vector<RankItem> Plugin::rankItems(QueryContext ctx)
 {
     if (!ctx.isValid())
         return {};

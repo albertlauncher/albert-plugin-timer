@@ -46,7 +46,7 @@ public:
 
     QString defaultTrigger() const override;
     QString synopsis(const QString &) const override;
-    std::vector<albert::RankItem> rankItems(albert::QueryContext &) override;
+    std::vector<albert::RankItem> rankItems(albert::QueryContext) override;
     std::vector<std::shared_ptr<albert::Item>> handleEmptyQuery() override;
 
     void startTimer(const QString &name, uint seconds);
